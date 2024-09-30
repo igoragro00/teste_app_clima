@@ -10,6 +10,9 @@ LOGO_LAMMA_URL_HEADER = "https://lamma.com.br/wp-content/uploads/2024/08/lammapy
 # URL da imagem do NASA POWER para a barra lateral
 LOGO_NASA_POWER_URL_SIDEBAR = "https://www.earthdata.nasa.gov/s3fs-public/styles/small_third_320px_/public/2022-11/power_logo_event.png?VersionId=pZIOrAAZH6vCGOJMjhhwP91WJkg0sCus&itok=DrjfYom6"
 
+# URL do arquivo de modelo para download
+MODELO_ARQUIVO_URL = "https://github.com/igoragro00/teste_app_clima/blob/main/Modelo_arquivo_entrada.xlsx?raw=true"
+
 # Função para buscar dados da API NASA POWER
 def obter_dados_nasa(latitude, longitude, data_inicio, data_fim):
     url = f"https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR,RH2M,T2M,T2M_MAX,T2M_MIN,T2MDEW,WS2M,WS2M_MAX,WS2M_MIN,ALLSKY_SFC_SW_DWN,CLRSKY_SFC_SW_DWN&community=RE&longitude={longitude}&latitude={latitude}&start={data_inicio}&end={data_fim}&format=JSON"
@@ -139,6 +142,15 @@ st.markdown(
     """, unsafe_allow_html=True
 )
 
+# Exibir observação sobre coordenadas em graus decimais
+st.markdown(
+    """
+    <p style='color:red;'>
+    Importante: As coordenadas devem estar em graus decimais. Exemplo: Latitude -21.7946, Longitude -48.1766
+    </p>
+    """, unsafe_allow_html=True
+)
+
 # Opção de inserir um local manualmente ou carregar um arquivo Excel
 opcao = st.radio("Escolha a forma de inserir os dados:", ("Inserir um local manualmente", "Carregar arquivo Excel com múltiplos locais"))
 
@@ -175,6 +187,9 @@ if opcao == "Inserir um local manualmente":
             st.error("Erro ao buscar dados da NASA POWER.")
 
 elif opcao == "Carregar arquivo Excel com múltiplos locais":
+    # Exibir link para download do modelo de arquivo
+    st.markdown(f"[Baixe o modelo de arquivo aqui]({MODELO_ARQUIVO_URL}) para inserir múltiplos locais.")
+    
     # Upload de arquivo Excel
     file = st.file_uploader("Faça upload de um arquivo Excel com colunas: 'Nome do Local', 'Latitude', 'Longitude'")
 
