@@ -28,6 +28,21 @@ VARIAVEIS_DISPONIVEIS = {
     'Qo': 'CLRSKY_SFC_SW_DWN'  # Radiação Solar de Céu Claro
 }
 
+# Descrição das variáveis
+DESCRICAO_VARIAVEIS = {
+    'P': 'Precipitação corrigida (mm)',
+    'UR': 'Umidade Relativa a 2 metros (%)',
+    'Tmed': 'Temperatura média a 2 metros (°C)',
+    'Tmax': 'Temperatura máxima a 2 metros (°C)',
+    'Tmin': 'Temperatura mínima a 2 metros (°C)',
+    'Tdew': 'Ponto de orvalho a 2 metros (°C)',
+    'U2': 'Velocidade do vento a 2 metros (m/s)',
+    'U2max': 'Velocidade máxima do vento a 2 metros (m/s)',
+    'U2min': 'Velocidade mínima do vento a 2 metros (m/s)',
+    'Qg': 'Radiação solar incidente na superfície (W/m²)',
+    'Qo': 'Radiação solar de céu claro na superfície (W/m²)'
+}
+
 # Função para buscar dados da API NASA POWER
 def obter_dados_nasa(latitude, longitude, data_inicio, data_fim, variaveis):
     # Cria a lista de parâmetros selecionados pelo usuário
@@ -54,7 +69,7 @@ def obter_dados_nasa(latitude, longitude, data_inicio, data_fim, variaveis):
 def criar_definicoes(variaveis):
     definicoes = {
         "Variável": variaveis,
-        "Descrição": [VARIAVEIS_DISPONIVEIS[v] for v in variaveis]
+        "Descrição": [DESCRICAO_VARIAVEIS[v] for v in variaveis]
     }
     df_definicoes = pd.DataFrame(definicoes)
     return df_definicoes
@@ -133,6 +148,11 @@ variaveis_selecionadas = st.multiselect(
     default=list(VARIAVEIS_DISPONIVEIS.keys())
 )
 
+# Exibir descrição das variáveis selecionadas
+st.markdown("### Descrição das variáveis selecionadas:")
+for var in variaveis_selecionadas:
+    st.write(f"**{var}**: {DESCRICAO_VARIAVEIS[var]}")
+
 # Exibir observação sobre o tempo de processamento dependendo da quantidade de dados
 st.markdown(
     """
@@ -163,7 +183,7 @@ if opcao == "Inserir um local manualmente":
     # Botão para buscar dados
     if st.button("Buscar dados"):
         with st.spinner('Estamos processando seus dados. Aguarde.'):
-            st.session_state['dados'] = obter_dados_nasa(latitude, longitude, data_inicio_formatada, data_fim_formatada, variaveis_selecionadas)
+            st.session_state['dados'] = obter_dados_nasa(latitude, longitude, data_inicio.strftime("%Y%m%d"), data_fim.strftime("%Y%m%d"), variaveis_selecionadas)
         
         if st.session_state['dados'] is not None:
             st.success("Dados obtidos com sucesso!")
@@ -198,7 +218,7 @@ elif opcao == "Carregar arquivo Excel com múltiplos locais":
     if file:
         with st.spinner('Estamos processando seus dados. Aguarde.'):
             # Processar o arquivo e obter dados climáticos para todos os locais
-            st.session_state['dados'] = processar_excel(file, data_inicio_formatada, data_fim_formatada, variaveis_selecionadas)
+            st.session_state['dados'] = processar_excel(file, data_inicio.strftime("%Y%m%d"), data_fim.strftime("%Y%m%d"), variaveis_selecionadas)
         
         if st.session_state['dados'] is not None:
             st.success("Dados obtidos com sucesso!")
