@@ -129,6 +129,16 @@ data_fim = st.date_input("Data de fim", value=hoje, min_value=data_inicio, max_v
 data_inicio_formatada = data_inicio.strftime("%Y%m%d")
 data_fim_formatada = data_fim.strftime("%Y%m%d")
 
+# Exibir observação sobre o tempo de processamento dependendo da quantidade de dados
+st.markdown(
+    """
+    <p style='color:red;'>
+    Observação: Dependendo da quantidade de locais e anos de dados, o processo de download pode demorar. 
+    Por exemplo, para 20 locais e 30 anos de dados, pode levar em torno de 10 minutos para completar o download.
+    </p>
+    """, unsafe_allow_html=True
+)
+
 # Opção de inserir um local manualmente ou carregar um arquivo Excel
 opcao = st.radio("Escolha a forma de inserir os dados:", ("Inserir um local manualmente", "Carregar arquivo Excel com múltiplos locais"))
 
@@ -194,7 +204,6 @@ elif opcao == "Carregar arquivo Excel com múltiplos locais":
             )
         else:
             st.error("Erro ao processar o arquivo ou buscar dados da NASA POWER.")
-
 
 
 #streamlit run "c:/Users/Igor Vieira/App_Lamma/app_lamma_clima.py"
