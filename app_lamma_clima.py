@@ -55,14 +55,17 @@ def obter_dados_nasa(latitude, longitude, data_inicio, data_fim, variaveis):
         dados = response.json()
         parametros = dados['properties']['parameter']
         
-        # Organizar os dados conforme as variáveis selecionadas
-        df = pd.DataFrame({'Data': list(parametros[variaveis[0]].keys())})
-        
-        for v in variaveis:
-            df[v] = parametros[VARIAVEIS_DISPONIVEIS[v]].values()
-            
-        return df
+        # Verificar se os parâmetros selecionados estão no resultado
+        if all(var in parametros for var in [VARIAVEIS_DISPONIVEIS[v] for v in variaveis]):
+            df = pd.DataFrame({'Data': list(parametros[VARIAVEIS_DISPONIVEIS[variaveis[0]]].keys())})
+            for v in variaveis:
+                df[v] = parametros[VARIAVEIS_DISPONIVEIS[v]].values()
+            return df
+        else:
+            st.error("Algumas das variáveis selecionadas não estão disponíveis no resultado da API.")
+            return None
     else:
+        st.error("Erro ao buscar dados da API NASA POWER. Verifique sua conexão ou tente novamente mais tarde.")
         return None
 
 # Função para criar uma aba com as definições de cada variável
@@ -172,20 +175,38 @@ st.markdown(
     """, unsafe_allow_html=True
 )
 
+# Exibir observação sobre coordenadas em graus decimais
+st.markdown(
+    """
+    <p style='color:red;'>
+    Atenção aos Dados Climáticos da NASA POWER
+
+Os dados da NASA POWER têm um atraso de 6 dias e uma resolução espacial de 0,5° x 0,5° (aproximadamente 55 km).
+Isso pode afetar a precisão em áreas menores ou análises muito recentes. 
+Considere essas características ao utilizar os dados para suas atividades.
+    </p>
+    """, unsafe_allow_html=True
+)
+
 # Opção de inserir um local manualmente ou carregar um arquivo Excel
 opcao = st.radio("Escolha a forma de inserir os dados:", ("Inserir um local manualmente", "Carregar arquivo Excel com múltiplos locais"))
 
 if opcao == "Inserir um local manualmente":
-    # Inputs para latitude e longitude
-    latitude = st.number_input("Latitude", format="%.6f", value=st.session_state.get('latitude', -21.7946))
-    longitude = st.number_input("Longitude", format="%.6f", value=st.session_state.get('longitude', -48.1766))
+    # Inputs para latitude e longitude com precisão de seis casas decimais
+    latitude = st.text_input("Latitude", value="-21.794600")
+    longitude = st.text_input("Longitude", value="-48.176600")
 
     # Botão para buscar dados
     if st.button("Buscar dados"):
         with st.spinner('Estamos processando seus dados. Aguarde.'):
-            st.session_state['dados'] = obter_dados_nasa(latitude, longitude, data_inicio.strftime("%Y%m%d"), data_fim.strftime("%Y%m%d"), variaveis_selecionadas)
+            try:
+                lat = float(latitude)
+                lon = float(longitude)
+                st.session_state['dados'] = obter_dados_nasa(lat, lon, data_inicio.strftime("%Y%m%d"), data_fim.strftime("%Y%m%d"), variaveis_selecionadas)
+            except ValueError:
+                st.error("Por favor, insira valores válidos para latitude e longitude.")
         
-        if st.session_state['dados'] is not None:
+        if st.session_state.get('dados') is not None:
             st.success("Dados obtidos com sucesso!")
             st.write(st.session_state['dados'])
             
@@ -220,7 +241,7 @@ elif opcao == "Carregar arquivo Excel com múltiplos locais":
             # Processar o arquivo e obter dados climáticos para todos os locais
             st.session_state['dados'] = processar_excel(file, data_inicio.strftime("%Y%m%d"), data_fim.strftime("%Y%m%d"), variaveis_selecionadas)
         
-        if st.session_state['dados'] is not None:
+        if st.session_state.get('dados') is not None:
             st.success("Dados obtidos com sucesso!")
             st.write(st.session_state['dados'])
             
@@ -242,6 +263,7 @@ elif opcao == "Carregar arquivo Excel com múltiplos locais":
             )
         else:
             st.error("Erro ao processar o arquivo ou buscar dados da NASA POWER.")
+
 
 
 #streamlit run "c:/Users/Igor Vieira/App_Lamma/app_lamma_clima.py"
