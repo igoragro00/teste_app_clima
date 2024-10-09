@@ -45,7 +45,6 @@ DESCRICAO_VARIAVEIS = {
 
 # Função para buscar dados da API NASA POWER
 def obter_dados_nasa(latitude, longitude, data_inicio, data_fim, variaveis):
-    # Cria a lista de parâmetros selecionados pelo usuário
     parametros = ','.join([VARIAVEIS_DISPONIVEIS[v] for v in variaveis])
     
     url = f"https://power.larc.nasa.gov/api/temporal/daily/point?parameters={parametros}&community=RE&longitude={longitude}&latitude={latitude}&start={data_inicio}&end={data_fim}&format=JSON"
@@ -55,7 +54,6 @@ def obter_dados_nasa(latitude, longitude, data_inicio, data_fim, variaveis):
         dados = response.json()
         parametros = dados['properties']['parameter']
         
-        # Verificar se os parâmetros selecionados estão no resultado
         if all(var in parametros for var in [VARIAVEIS_DISPONIVEIS[v] for v in variaveis]):
             df = pd.DataFrame({'Data': list(parametros[VARIAVEIS_DISPONIVEIS[variaveis[0]]].keys())})
             for v in variaveis:
@@ -123,8 +121,8 @@ st.sidebar.write("""
 - O NASA POWER (Prediction of Worldwide Energy Resources) é um sistema que fornece dados climáticos históricos e atuais a partir de satélites da NASA.
 """)
 
-st.sidebar.write("""
 st.sidebar.subheader("RESPONSÁVEIS")
+st.sidebar.write("""
 - Prof. Dr. Rouverson Pereira da Silva – FCAV/UNESP [Linkedin](https://www.linkedin.com/in/rouverson-pereira-da-silva/)
 - Msc. Igor Cristian de Oliveira Vieira - FCAV/UNESP [Linkedin](https://www.linkedin.com/in/eng-igor-vieira/)
 - Msc. Lucas Eduardo Zonfrilli - FCAV/UNESP [Linkedin](https://www.linkedin.com/in/lucas-eduardo-zonfrilli/) 
@@ -190,15 +188,14 @@ st.markdown(
     """, unsafe_allow_html=True
 )
 
-# Exibir observação sobre coordenadas em graus decimais
+# Exibir observação sobre dados climáticos da NASA POWER
 st.markdown(
     """
     <p style='color:red;'>
-    Atenção aos Dados Climáticos da NASA POWER
-
-Os dados da NASA POWER têm um atraso de 6 dias e uma resolução espacial de 0,5° x 0,5° (aproximadamente 55 km).
-Isso pode afetar a precisão em áreas menores ou análises muito recentes. 
-Considere essas características ao utilizar os dados para suas atividades.
+    Atenção aos Dados Climáticos da NASA POWER:
+    Os dados da NASA POWER têm um atraso de 6 dias e uma resolução espacial de 0,5° x 0,5° (aproximadamente 55 km).
+    Isso pode afetar a precisão em áreas menores ou análises muito recentes. 
+    Considere essas características ao utilizar os dados para suas atividades.
     </p>
     """, unsafe_allow_html=True
 )
@@ -278,7 +275,6 @@ elif opcao == "Carregar arquivo Excel com múltiplos locais":
             )
         else:
             st.error("Erro ao processar o arquivo ou buscar dados da NASA POWER.")
-
 
 
 #streamlit run "c:/Users/Igor Vieira/App_Lamma/app_lamma_clima.py"
