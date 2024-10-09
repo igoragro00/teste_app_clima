@@ -124,7 +124,7 @@ st.sidebar.write("""
 """)
 
 st.sidebar.write("""
-*RESPONSÁVEIS:*  
+st.sidebar.subheader("RESPONSÁVEIS")
 - Prof. Dr. Rouverson Pereira da Silva – FCAV/UNESP [Linkedin](https://www.linkedin.com/in/rouverson-pereira-da-silva/)
 - Msc. Igor Cristian de Oliveira Vieira - FCAV/UNESP [Linkedin](https://www.linkedin.com/in/eng-igor-vieira/)
 - Msc. Lucas Eduardo Zonfrilli - FCAV/UNESP [Linkedin](https://www.linkedin.com/in/lucas-eduardo-zonfrilli/) 
