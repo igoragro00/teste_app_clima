@@ -28,8 +28,24 @@ VARIAVEIS_DISPONIVEIS = {
     'Qo': 'CLRSKY_SFC_SW_DWN'  # Radiação Solar de Céu Claro
 }
 
+# Descrição das variáveis
+DESCRICAO_VARIAVEIS = {
+    'P': 'Precipitação corrigida (mm)',
+    'UR': 'Umidade Relativa a 2 metros (%)',
+    'Tmed': 'Temperatura média a 2 metros (°C)',
+    'Tmax': 'Temperatura máxima a 2 metros (°C)',
+    'Tmin': 'Temperatura mínima a 2 metros (°C)',
+    'Tdew': 'Ponto de orvalho a 2 metros (°C)',
+    'U2': 'Velocidade do vento a 2 metros (m/s)',
+    'U2max': 'Velocidade máxima do vento a 2 metros (m/s)',
+    'U2min': 'Velocidade mínima do vento a 2 metros (m/s)',
+    'Qg': 'Radiação solar incidente na superfície (W/m²)',
+    'Qo': 'Radiação solar de céu claro na superfície (W/m²)'
+}
+
 # Função para buscar dados da API NASA POWER
 def obter_dados_nasa(latitude, longitude, data_inicio, data_fim, variaveis):
+    # Cria a lista de parâmetros selecionados pelo usuário
     parametros = ','.join([VARIAVEIS_DISPONIVEIS[v] for v in variaveis])
     
     url = f"https://power.larc.nasa.gov/api/temporal/daily/point?parameters={parametros}&community=RE&longitude={longitude}&latitude={latitude}&start={data_inicio}&end={data_fim}&format=JSON"
@@ -39,6 +55,7 @@ def obter_dados_nasa(latitude, longitude, data_inicio, data_fim, variaveis):
         dados = response.json()
         parametros = dados['properties']['parameter']
         
+        # Verificar se os parâmetros selecionados estão no resultado
         if all(var in parametros for var in [VARIAVEIS_DISPONIVEIS[v] for v in variaveis]):
             df = pd.DataFrame({'Data': list(parametros[VARIAVEIS_DISPONIVEIS[variaveis[0]]].keys())})
             for v in variaveis:
@@ -50,6 +67,15 @@ def obter_dados_nasa(latitude, longitude, data_inicio, data_fim, variaveis):
     else:
         st.error("Erro ao buscar dados da API NASA POWER. Verifique sua conexão ou tente novamente mais tarde.")
         return None
+
+# Função para criar uma aba com as definições de cada variável
+def criar_definicoes(variaveis):
+    definicoes = {
+        "Variável": variaveis,
+        "Descrição": [DESCRICAO_VARIAVEIS[v] for v in variaveis]
+    }
+    df_definicoes = pd.DataFrame(definicoes)
+    return df_definicoes
 
 # Função para processar o arquivo Excel
 def processar_excel(file, data_inicio, data_fim, variaveis):
@@ -83,6 +109,26 @@ st.title("NASA POWER - Download de Dados Climáticos")
 # Barra lateral
 st.sidebar.title("Informações sobre o App")
 st.sidebar.image(LOGO_NASA_POWER_URL_SIDEBAR, use_column_width=True)
+
+st.sidebar.write("""
+### Importância dos Dados Climáticos:
+- Os dados climáticos são fundamentais para o planejamento agrícola, monitoramento ambiental e gestão de recursos naturais.
+- O acesso a informações sobre temperatura, precipitação, umidade e radiação solar ajuda a entender padrões climáticos e otimizar atividades no campo.
+
+### Objetivo do Aplicativo:
+- Este aplicativo oferece uma maneira simples e prática de obter dados climáticos de qualquer local do mundo, utilizando as coordenadas geográficas e o período selecionado pelo usuário.
+- O aplicativo permite baixar os dados diretamente em formato Excel, facilitando a análise e integração com outros sistemas.
+
+### Sobre o NASA POWER:
+- O NASA POWER (Prediction of Worldwide Energy Resources) é um sistema que fornece dados climáticos históricos e atuais a partir de satélites da NASA.
+""")
+
+# Sidebar "REALIZAÇÃO"
+st.sidebar.subheader("REALIZAÇÃO")
+st.sidebar.image("http://lamma.com.br/wp-content/uploads/2024/02/IMG_1713-300x81.png")
+st.sidebar.write("[Visite o site do LAMMA](https://lamma.com.br/)")
+st.sidebar.write("[Visite o instagram do LAMMA](https://www.instagram.com/lamma.unesp/)")
+st.sidebar.write("[Visite o site do RSRG](https://www.rsrg.net.br/)")
 
 # Inputs para intervalo de datas
 hoje = datetime.today()
@@ -118,46 +164,114 @@ st.markdown("### Descrição das variáveis selecionadas:")
 for var in variaveis_selecionadas:
     st.write(f"{var}: {DESCRICAO_VARIAVEIS[var]}")
 
+# Exibir observação sobre o tempo de processamento dependendo da quantidade de dados
+st.markdown(
+    """
+    <p style='color:red;'>
+    Observação: Dependendo da quantidade de locais e anos de dados, o processo de download pode demorar. 
+    Por exemplo, para 20 locais e 30 anos de dados, pode levar em torno de 10 minutos para completar o download.
+    </p>
+    """, unsafe_allow_html=True
+)
+
+# Exibir observação sobre coordenadas em graus decimais
+st.markdown(
+    """
+    <p style='color:red;'>
+    Importante: As coordenadas devem estar em graus decimais. Exemplo: Latitude -21.7946, Longitude -48.1766
+    </p>
+    """, unsafe_allow_html=True
+)
+
+# Exibir observação sobre coordenadas em graus decimais
+st.markdown(
+    """
+    <p style='color:red;'>
+    Atenção aos Dados Climáticos da NASA POWER
+
+Os dados da NASA POWER têm um atraso de 6 dias e uma resolução espacial de 0,5° x 0,5° (aproximadamente 55 km).
+Isso pode afetar a precisão em áreas menores ou análises muito recentes. 
+Considere essas características ao utilizar os dados para suas atividades.
+    </p>
+    """, unsafe_allow_html=True
+)
+
 # Opção de inserir um local manualmente ou carregar um arquivo Excel
 opcao = st.radio("Escolha a forma de inserir os dados:", ("Inserir um local manualmente", "Carregar arquivo Excel com múltiplos locais"))
 
 if opcao == "Inserir um local manualmente":
+    # Inputs para latitude e longitude com precisão de seis casas decimais
     latitude = st.text_input("Latitude", value="-21.794600")
     longitude = st.text_input("Longitude", value="-48.176600")
 
+    # Botão para buscar dados
     if st.button("Buscar dados"):
         with st.spinner('Estamos processando seus dados. Aguarde.'):
             try:
                 lat = float(latitude)
                 lon = float(longitude)
-                dados = obter_dados_nasa(lat, lon, data_inicio.strftime("%Y%m%d"), data_fim.strftime("%Y%m%d"), variaveis_selecionadas)
-                if dados is not None:
-                    st.write(dados)
-                    # Download dos dados
-                    output = BytesIO()
-                    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-                        dados.to_excel(writer, sheet_name="Dados_Climaticos", index=False)
-                    output.seek(0)
-                    st.download_button(label="Baixar dados como Excel", data=output, file_name="dados_climaticos.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                st.session_state['dados'] = obter_dados_nasa(lat, lon, data_inicio.strftime("%Y%m%d"), data_fim.strftime("%Y%m%d"), variaveis_selecionadas)
             except ValueError:
                 st.error("Por favor, insira valores válidos para latitude e longitude.")
+        
+        if st.session_state.get('dados') is not None:
+            st.success("Dados obtidos com sucesso!")
+            st.write(st.session_state['dados'])
+            
+            # Criando a aba de definições das variáveis
+            df_definicoes = criar_definicoes(variaveis_selecionadas)
+            
+            # Permitir download dos dados em formato Excel
+            output = BytesIO()
+            with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+                st.session_state['dados'].to_excel(writer, sheet_name="Dados_Climaticos", index=False)
+                df_definicoes.to_excel(writer, sheet_name="Definicoes", index=False)
+            output.seek(0)
+
+            st.download_button(
+                label="Baixar dados como Excel",
+                data=output,
+                file_name="dados_climaticos.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
+        else:
+            st.error("Erro ao buscar dados da NASA POWER.")
 
 elif opcao == "Carregar arquivo Excel com múltiplos locais":
+    # Exibir link para download do modelo de arquivo
     st.markdown(f"[Baixe o modelo de arquivo aqui]({MODELO_ARQUIVO_URL}) para inserir múltiplos locais.")
     
+    # Upload de arquivo Excel
     file = st.file_uploader("Faça upload de um arquivo Excel com colunas: 'Nome do Local', 'Latitude', 'Longitude'")
+
     if file:
         with st.spinner('Estamos processando seus dados. Aguarde.'):
-            dados = processar_excel(file, data_inicio.strftime("%Y%m%d"), data_fim.strftime("%Y%m%d"), variaveis_selecionadas)
-            if dados is not None:
-                st.write(dados)
-                output = BytesIO()
-                with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-                    dados.to_excel(writer, sheet_name="Dados_Climaticos", index=False)
-                output.seek(0)
-                st.download_button(label="Baixar dados como Excel", data=output, file_name="dados_climaticos_multiplos_locais.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-            else:
-                st.error("Erro ao processar o arquivo ou buscar dados da NASA POWER.")
+            # Processar o arquivo e obter dados climáticos para todos os locais
+            st.session_state['dados'] = processar_excel(file, data_inicio.strftime("%Y%m%d"), data_fim.strftime("%Y%m%d"), variaveis_selecionadas)
+        
+        if st.session_state.get('dados') is not None:
+            st.success("Dados obtidos com sucesso!")
+            st.write(st.session_state['dados'])
+            
+            # Criando a aba de definições das variáveis
+            df_definicoes = criar_definicoes(variaveis_selecionadas)
+            
+            # Download dos dados e definições em formato Excel
+            output = BytesIO()
+            with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+                st.session_state['dados'].to_excel(writer, sheet_name="Dados_Climaticos", index=False)
+                df_definicoes.to_excel(writer, sheet_name="Definicoes", index=False)
+            output.seek(0)
+
+            st.download_button(
+                label="Baixar dados como Excel",
+                data=output,
+                file_name="dados_climaticos_multiplos_locais.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
+        else:
+            st.error("Erro ao processar o arquivo ou buscar dados da NASA POWER.")
+
 
 
 #streamlit run "c:/Users/Igor Vieira/App_Lamma/app_lamma_clima.py"
