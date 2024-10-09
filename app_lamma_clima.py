@@ -98,7 +98,17 @@ variaveis_selecionadas = st.multiselect(
     default=list(VARIAVEIS_DISPONIVEIS.keys())
 )
 
-# Exibir botão de limpar cache
+# Observação sobre o cache e a necessidade de limpeza
+st.markdown(
+    """
+    ### Limpeza do Cache:
+    Como estamos lidando com dados climáticos pesados, é importante limpar o cache de armazenamento temporário depois de realizar downloads.
+    Isso ajudará a não sobrecarregar a memória local e manter a performance do aplicativo em caso de múltiplos acessos simultâneos.
+    Se notar lentidão ou uso excessivo de memória, clique no botão abaixo para limpar o cache e liberar o armazenamento.
+    """
+)
+
+# Botão de limpar cache
 if st.button("Limpar Cache"):
     st.cache_data.clear()
     st.success("Cache limpo com sucesso!")
