@@ -123,6 +123,13 @@ st.sidebar.write("""
 - O NASA POWER (Prediction of Worldwide Energy Resources) é um sistema que fornece dados climáticos históricos e atuais a partir de satélites da NASA.
 """)
 
+st.sidebar.write("""
+*RESPONSÁVEIS:*  
+- Prof. Dr. Rouverson Pereira da Silva – FCAV/UNESP [Linkedin](https://www.linkedin.com/in/rouverson-pereira-da-silva/)
+- Msc. Igor Cristian de Oliveira Vieira - FCAV/UNESP [Linkedin](https://www.linkedin.com/in/eng-igor-vieira/)
+- Msc. Lucas Eduardo Zonfrilli - FCAV/UNESP [Linkedin](https://www.linkedin.com/in/lucas-eduardo-zonfrilli/) 
+""")
+
 # Sidebar "REALIZAÇÃO"
 st.sidebar.subheader("REALIZAÇÃO")
 st.sidebar.image("http://lamma.com.br/wp-content/uploads/2024/02/IMG_1713-300x81.png")
