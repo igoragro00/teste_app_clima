@@ -273,7 +273,17 @@ elif opcao == "Carregar arquivo Excel com múltiplos locais":
                 file_name="dados_climaticos_multiplos_locais.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
-        else:
+            # Adicionando citação sobre o aplicativo
+            st.markdown(
+                """
+                **Citação do aplicativo:**  
+                Vieira, I. C. O.; Zonfrilli, L. E.; Silva, R. P.  
+                **Lammapy: NASA POWER - Download de Dados Climáticos.**  
+                Disponível em: [https://lamma.com.br/lammapy](https://lamma.com.br/lammapy)  
+                """
+            )
+
+            else:
             st.error("Erro ao processar o arquivo ou buscar dados da NASA POWER.")
 
 
