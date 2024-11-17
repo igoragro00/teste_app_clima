@@ -238,6 +238,16 @@ if opcao == "Inserir um local manualmente":
                 file_name="dados_climaticos.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
+
+            # Exibir a citação logo após o botão de download
+            st.markdown(
+                """
+                **Por favor, cite o aplicativo ao utilizar os dados:**  
+                Vieira, I. C. O.; Zonfrilli, L. E.; Silva, R. P.  
+                **Lammapy: NASA POWER - Download de Dados Climáticos.**  
+                Disponível em: [https://lamma.com.br/lammapy](https://lamma.com.br/lammapy)  
+                """
+            )
         else:
             st.error("Erro ao buscar dados da NASA POWER.")
 
@@ -248,47 +258,46 @@ elif opcao == "Carregar arquivo Excel com múltiplos locais":
     # Upload de arquivo Excel
     file = st.file_uploader("Faça upload de um arquivo Excel com colunas: 'Nome do Local', 'Latitude', 'Longitude'")
 
-if st.button("Buscar dados"):
-    with st.spinner('Estamos processando seus dados. Aguarde.'):
-        try:
-            lat = float(latitude)
-            lon = float(longitude)
-            st.session_state['dados'] = obter_dados_nasa(lat, lon, data_inicio.strftime("%Y%m%d"), data_fim.strftime("%Y%m%d"), variaveis_selecionadas)
-        except ValueError:
-            st.error("Por favor, insira valores válidos para latitude e longitude.")
-    
-if st.session_state.get('dados') is not None:
-        st.success("Dados obtidos com sucesso!")
-        st.write(st.session_state['dados'])
-        
-        # Criando a aba de definições das variáveis
-        df_definicoes = criar_definicoes(variaveis_selecionadas)
-        
-        # Permitir download dos dados em formato Excel
-        output = BytesIO()
-        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-            st.session_state['dados'].to_excel(writer, sheet_name="Dados_Climaticos", index=False)
-            df_definicoes.to_excel(writer, sheet_name="Definicoes", index=False)
-        output.seek(0)
+    if file:
+        if st.button("Buscar dados"):
+            with st.spinner('Estamos processando seus dados. Aguarde.'):
+                try:
+                    st.session_state['dados'] = processar_excel(file, data_inicio.strftime("%Y%m%d"), data_fim.strftime("%Y%m%d"), variaveis_selecionadas)
+                except ValueError:
+                    st.error("Erro ao processar o arquivo. Verifique o formato dos dados.")
+            
+            if st.session_state.get('dados') is not None:
+                st.success("Dados obtidos com sucesso!")
+                st.write(st.session_state['dados'])
+                
+                # Criando a aba de definições das variáveis
+                df_definicoes = criar_definicoes(variaveis_selecionadas)
+                
+                # Download dos dados e definições em formato Excel
+                output = BytesIO()
+                with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+                    st.session_state['dados'].to_excel(writer, sheet_name="Dados_Climaticos", index=False)
+                    df_definicoes.to_excel(writer, sheet_name="Definicoes", index=False)
+                output.seek(0)
 
-        st.download_button(
-            label="Baixar dados como Excel",
-            data=output,
-            file_name="dados_climaticos.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
-        
-        # Exibir a citação logo após o botão de download
-        st.markdown(
-            """
-            **Por favor, cite o aplicativo ao utilizar os dados:**  
-            Vieira, I. C. O.; Zonfrilli, L. E.; Silva, R. P.  
-            **Lammapy: NASA POWER - Download de Dados Climáticos.**  
-            Disponível em: [https://lamma.com.br/lammapy](https://lamma.com.br/lammapy)  
-            """
-        )
-else:
-        st.error("Erro ao buscar dados da NASA POWER.")
+                st.download_button(
+                    label="Baixar dados como Excel",
+                    data=output,
+                    file_name="dados_climaticos_multiplos_locais.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
+
+                # Exibir a citação logo após o botão de download
+                st.markdown(
+                    """
+                    **Por favor, cite o aplicativo ao utilizar os dados:**  
+                    Vieira, I. C. O.; Zonfrilli, L. E.; Silva, R. P.  
+                    **Lammapy: NASA POWER - Download de Dados Climáticos.**  
+                    Disponível em: [https://lamma.com.br/lammapy](https://lamma.com.br/lammapy)  
+                    """
+                )
+            else:
+                st.error("Erro ao processar o arquivo ou buscar dados da NASA POWER.")
 
 
 #streamlit run "c:/Users/Igor Vieira/App_Lamma/app_lamma_clima.py"
