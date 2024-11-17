@@ -282,8 +282,7 @@ elif opcao == "Carregar arquivo Excel com múltiplos locais":
                 Disponível em: [https://lamma.com.br/lammapy](https://lamma.com.br/lammapy)  
                 """
             )
-
-            else:
+        else:
             st.error("Erro ao processar o arquivo ou buscar dados da NASA POWER.")
 
 
