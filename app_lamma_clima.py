@@ -248,7 +248,7 @@ elif opcao == "Carregar arquivo Excel com múltiplos locais":
     # Upload de arquivo Excel
     file = st.file_uploader("Faça upload de um arquivo Excel com colunas: 'Nome do Local', 'Latitude', 'Longitude'")
 
-    if st.button("Buscar dados"):
+if st.button("Buscar dados"):
     with st.spinner('Estamos processando seus dados. Aguarde.'):
         try:
             lat = float(latitude)
@@ -257,7 +257,7 @@ elif opcao == "Carregar arquivo Excel com múltiplos locais":
         except ValueError:
             st.error("Por favor, insira valores válidos para latitude e longitude.")
     
-    if st.session_state.get('dados') is not None:
+if st.session_state.get('dados') is not None:
         st.success("Dados obtidos com sucesso!")
         st.write(st.session_state['dados'])
         
@@ -287,7 +287,7 @@ elif opcao == "Carregar arquivo Excel com múltiplos locais":
             Disponível em: [https://lamma.com.br/lammapy](https://lamma.com.br/lammapy)  
             """
         )
-    else:
+else:
         st.error("Erro ao buscar dados da NASA POWER.")
 
 
