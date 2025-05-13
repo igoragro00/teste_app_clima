@@ -98,7 +98,7 @@ def processar_excel(file, data_inicio, data_fim, variaveis):
         return None
 
 # Interface do Streamlit
-st.image(LOGO_LAMMA_URL_HEADER, use_column_width=True)
+st.image(LOGO_LAMMA_URL_HEADER, use_container_width=True)
 
 st.subheader("Aplicativo desenvolvido pelo LAMMA - Laboratório de Máquinas e Mecanização Agrícola da UNESP/Jaboticabal")
 
