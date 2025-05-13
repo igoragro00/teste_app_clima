@@ -126,7 +126,7 @@ st.sidebar.write("""
 - Prof. Dr. Rouverson Pereira da Silva – FCAV/UNESP [Linkedin](https://www.linkedin.com/in/rouverson-pereira-da-silva/)
 - Msc. Igor Cristian de Oliveira Vieira - FCAV/UNESP [Linkedin](https://www.linkedin.com/in/eng-igor-vieira/)
 - Msc. Lucas Eduardo Zonfrilli - FCAV/UNESP [Linkedin](https://www.linkedin.com/in/lucas-eduardo-zonfrilli/)
-- Msc. Breno dos Santos Silva - FCAV/UNESP [https://www.linkedin.com/in/breno-santos-a47606250/)
+- Msc. Breno dos Santos Silva - FCAV/UNESP [Linkedin]([https://www.linkedin.com/in/breno-santos-a47606250/)
 """)
 
 # Sidebar "REALIZAÇÃO"
