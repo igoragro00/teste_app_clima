@@ -106,7 +106,7 @@ st.title("NASA POWER - Download de Dados Climáticos")
 
 # Barra lateral
 st.sidebar.title("Informações sobre o App")
-st.sidebar.image(LOGO_NASA_POWER_URL_SIDEBAR, use_column_width=True)
+st.sidebar.image(LOGO_NASA_POWER_URL_SIDEBAR, use_container_width=True)
 
 st.sidebar.write("""
 ### Importância dos Dados Climáticos:
